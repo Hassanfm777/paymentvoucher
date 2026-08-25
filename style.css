@@ -19,12 +19,12 @@ body {
 @media print {
     @page {
         size: A4 portrait;
-        margin: 1cm;
+        margin: 0; /* هذا السطر يخفي رابط جيت هب وتاريخ الطباعة التلقائي */
     }
 
     body {
         margin: 0;
-        padding: 0;
+        padding: 1cm; /* إضافة مساحة لكي لا تلتصق الورقة بالحواف */
         background-color: white !important;
     }
 
