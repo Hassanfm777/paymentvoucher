@@ -1,0 +1,64 @@
+/* Custom styles that augment Tailwind */
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap');
+
+body {
+    font-family: 'Cairo', sans-serif, system-ui;
+}
+
+.voucher-container {
+    max-width: 1000px; /* Matches the width of an A4 page roughly */
+    background-color: white;
+}
+
+/* Screen visibility classes */
+.hidden-screen {
+    display: none;
+}
+
+/* Print specific styles */
+@media print {
+    @page {
+        size: A4 portrait;
+        margin: 1cm;
+    }
+
+    body {
+        margin: 0;
+        padding: 0;
+        background-color: white !important;
+    }
+
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    .voucher-container {
+        width: 100%;
+        max-width: none;
+        margin: 0 auto;
+        padding: 0;
+        box-shadow: none !important;
+    }
+
+    /* Print specific visibility */
+    .hide-on-print {
+        display: none !important;
+    }
+
+    .print-section {
+        display: none !important;
+    }
+
+    body.printing-voucher .print-only-voucher {
+        display: block !important;
+    }
+    
+    body.printing-report .print-only-report {
+        display: block !important;
+    }
+
+    .print-header {
+        display: block !important;
+    }
+}
