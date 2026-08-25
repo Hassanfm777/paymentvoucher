@@ -239,7 +239,8 @@ function renderReport() {
     tbody.innerHTML = '';
     
     // Show newest first
-    transactions.slice().reverse().forEach(tx => {
+    for (let i = transactions.length - 1; i >= 0; i--) {
+        let tx = transactions[i];
         let tr = document.createElement('tr');
         tr.innerHTML = `
             <td class="border p-2">${tx.date}</td>
@@ -248,8 +249,59 @@ function renderReport() {
             <td class="border p-2 text-right">${tx.amount} ${tx.currency}</td>
             <td class="border p-2">${tx.method}</td>
             <td class="border p-2">${tx.reason}</td>
+            <td class="border p-2 text-center hide-on-print">
+                <button onclick="reprintVoucher(${i})" class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 text-sm">طباعة 🖨️</button>
+            </td>
         `;
         tbody.appendChild(tr);
-    });
+    }
     document.getElementById('reportDate').innerText = `Generated on: ${new Date().toLocaleString()}`;
 }
+
+// --- Reprint Old Voucher ---
+window.reprintVoucher = function(txIndex) {
+    let transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+    let tx = transactions[txIndex];
+    if (!tx) return;
+    
+    let parts = tx.amount.split('.');
+    let dhs = parts[0];
+    let fils = parts.length > 1 ? parts[1] : '0';
+
+    // Populate visual fields
+    document.getElementById('displayDhs').innerText = dhs;
+    document.getElementById('displayFils').innerText = fils;
+    document.getElementById('displayDate').innerText = tx.date;
+    document.getElementById('displayPayee').innerText = tx.payee;
+    document.getElementById('displaySerial').innerText = tx.serial;
+    document.getElementById('displayReason').innerText = tx.reason;
+    
+    let methodText = tx.method.startsWith('Cheque') ? `Cheque / شيك: ${tx.method.split(':')[1]}` : 'Cash / نقداً';
+    document.getElementById('displayMethodData').innerText = methodText;
+
+    // Briefly update inputs to calculate the Arabic/English words again
+    document.getElementById('inputCurrency').value = tx.currency;
+    document.getElementById('inputDhs').value = dhs;
+    document.getElementById('inputFils').value = fils;
+    
+    updateCurrencyLabels(); 
+    
+    document.getElementById('displayWordsEn').innerText = document.getElementById('inputWordsEn').value;
+    document.getElementById('displayWordsAr').innerText = document.getElementById('inputWordsAr').value;
+
+    // Switch view to print
+    document.getElementById('reportSection').classList.add('hidden');
+    document.getElementById('printableVoucher').classList.remove('hidden');
+    
+    // Auto-trigger print
+    setTimeout(() => {
+        document.body.classList.remove('printing-report');
+        document.body.classList.add('printing-voucher');
+        window.print();
+        document.body.classList.remove('printing-voucher');
+        
+        // Return to reports
+        document.getElementById('printableVoucher').classList.add('hidden');
+        document.getElementById('reportSection').classList.remove('hidden');
+    }, 300);
+};
